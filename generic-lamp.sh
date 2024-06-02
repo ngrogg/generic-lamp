@@ -42,7 +42,28 @@ function runProgram(){
     "2: MariaDB " \
     "Enter 1 or 2: "
     read databaseTech
-    #### Check input
+
+    #### Validation
+    while [[ $databaseTech -ne 1 && $databaseTech -ne 0 ]]; do
+            printf "%s\n" \
+            " " \
+            "ISSUE: Incorrect value passed" \
+            "----------------------------------------------------" \
+            " " \
+            "MySQL or MariaDB?" \
+            "----------------------------------------------------" \
+            "Choose a Database technology:" \
+            "1: MySQL " \
+            "2: MariaDB " \
+            "Enter 1 or 2: "
+            read databaseTech
+    done
+
+    if [[ $databaseTech -eq 1 ]]; then
+            databaseString="MySQL"
+    else
+            databaseString="MariaDB"
+    fi
 
     ### Prompt user to confirm if WordPress should be installed
 	printf "%s\n" \
@@ -51,9 +72,51 @@ function runProgram(){
     "Confirm if WordPress should be installed:" \
     "1: Install WordPress" \
     "0: Do NOT install WordPress" \
+    " " \
+    "IMPORTANT: Will not create/configure Apache vhost!" \
+    " " \
     "Enter 1 or 0: "
     read wordpressBool
-    #### Check input
+
+    #### Validation
+    while [[ $wordpressBool -ne 1 && $wordpressBool -ne 0 ]]; do
+            printf "%s\n" \
+            " " \
+            "ISSUE: Incorrect value passed" \
+            "----------------------------------------------------" \
+            " " \
+            "WordPress install?" \
+            "----------------------------------------------------" \
+            "Confirm if WordPress should be installed:" \
+            "1: Install WordPress" \
+            "0: Do NOT install WordPress" \
+            " " \
+            "IMPORTANT: Will not create/configure an Apache vhost!" \
+            " " \
+            "Enter 1 or 0: "
+            read wordpressBool
+    done
+
+    if [[ $wordpressBool -eq 1 ]]; then
+            wordPressString="yes"
+    else
+            wordPressString="no"
+    fi
+
+    ### Value confirmation before proceeding
+    printf "%s\n" \
+    "IMPORTANT: Value confirmation" \
+    "----------------------------------------------------" \
+    "Server Distro: " "$1" \
+    " " \
+    "Database tech to install: " "$databaseString" \
+    " " \
+    "Install WordPress? " "$wordPressString" \
+    " " \
+    "If all clear press enter to proceed or ctrl-c to cancel " \
+    " "
+
+    read junkInput
 
     ### Check Distro, make distro specific changes
 	printf "%s\n" \
@@ -68,6 +131,18 @@ function runProgram(){
                     "----------------------------------------------------" \
                     " "
                     packageManager="apt"
+
+                    #TODO
+                    #### Check for updates
+                    #### Install Apache + modsecurity
+                    ##### Enable Apache
+                    #### Install MySQL or MariaDB based on databaseTech
+                    ##### Enable MySQL/MariaDB
+                    ##### Configure MySQL/MariaDB
+                    #### Install Firewall (ufw for apt, firewalld for dnf)
+                    ##### Configure firewall for port 22, 80, 443 and 3306
+                    #### Install PHP + basic MySQL libraries
+
                     ;;
             [Uu]buntu)
                     printf "%s\n" \
@@ -75,6 +150,18 @@ function runProgram(){
                     "----------------------------------------------------" \
                     " "
                     packageManager="apt"
+
+                    #TODO
+                    #### Check for updates
+                    #### Install Apache + modsecurity
+                    ##### Enable Apache
+                    #### Install MySQL or MariaDB based on databaseTech
+                    ##### Enable MySQL/MariaDB
+                    ##### Configure MySQL/MariaDB
+                    #### Install Firewall (ufw for apt, firewalld for dnf)
+                    ##### Configure firewall for port 22, 80, 443 and 3306
+                    #### Install PHP + basic MySQL libraries
+
                     ;;
             [Ff]edora)
                     printf "%s\n" \
@@ -82,6 +169,18 @@ function runProgram(){
                     "----------------------------------------------------" \
                     " "
                     packageManager="dnf"
+
+                    #TODO
+                    #### Check for updates
+                    #### Install Apache + modsecurity
+                    ##### Enable Apache
+                    #### Install MySQL or MariaDB based on databaseTech
+                    ##### Enable MySQL/MariaDB
+                    ##### Configure MySQL/MariaDB
+                    #### Install Firewall (ufw for apt, firewalld for dnf)
+                    ##### Configure firewall for port 22, 80, 443 and 3306
+                    #### Install PHP + basic MySQL libraries
+
                     ;;
             [Rr]ocky)
                     printf "%s\n" \
@@ -89,6 +188,18 @@ function runProgram(){
                     "----------------------------------------------------" \
                     " "
                     packageManager="dnf"
+
+                    #TODO
+                    #### Check for updates
+                    #### Install Apache + modsecurity
+                    ##### Enable Apache
+                    #### Install MySQL or MariaDB based on databaseTech
+                    ##### Enable MySQL/MariaDB
+                    ##### Configure MySQL/MariaDB
+                    #### Install Firewall (ufw for apt, firewalld for dnf)
+                    ##### Configure firewall for port 22, 80, 443 and 3306
+                    #### Install PHP + basic MySQL libraries
+
                     ;;
             *)
                     printf "%s\n" \
@@ -99,6 +210,12 @@ function runProgram(){
                     helpFunction
                     ;;
     esac
+
+    #### Install WordPress based on wordpressBool
+    ##### Create docroot
+    ##### Install WordPress files
+    ##### Create upload folder
+    ##### Prompt user for next steps
 }
 
 ## Main, read passed flags
