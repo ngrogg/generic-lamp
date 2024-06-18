@@ -134,13 +134,24 @@ function runProgram(){
 
                     #TODO
                     #### Check for updates
+                    sudo apt update -y && sudo apt upgrade -y && sudo apt autoremove -y
+
                     #### Install Apache + modsecurity
+                    sudo apt install python3-certbot-apache certbot apache2
+
                     ##### Enable Apache
+                    sudo systemctl enable apache2
+
                     #### Install MySQL or MariaDB based on databaseTech
                     ##### Enable MySQL/MariaDB
                     ##### Configure MySQL/MariaDB
+
                     #### Install Firewall (ufw for apt, firewalld for dnf)
+                    sudo apt install ufw -y
+
                     ##### Configure firewall for port 22, 80, 443 and 3306
+                    sudo ufw allow 'WWW Full'
+
                     #### Install PHP + basic MySQL libraries
 
                     ;;
