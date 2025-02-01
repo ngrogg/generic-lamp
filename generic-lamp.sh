@@ -137,7 +137,7 @@ function runProgram(){
                     sudo apt update -y && sudo apt upgrade -y && sudo apt autoremove -y
 
                     #### Install Apache + modsecurity
-                    sudo apt install python3-certbot-apache certbot apache2
+                    sudo apt install python3-certbot-apache certbot apache2 fail2ban rsyslog
 
                     ##### Enable Apache
                     sudo systemctl enable apache2
@@ -145,6 +145,12 @@ function runProgram(){
                     #### Install MySQL or MariaDB based on databaseTech
                     ##### Enable MySQL/MariaDB
                     ##### Configure MySQL/MariaDB
+
+                    #### Enable fail2ban
+                    sudo systemctl enable rsyslog
+                    sudo systemctl start rsyslog
+                    sudo systemctl enable fail2ban
+                    sudo systemctl start fail2ban
 
                     #### Install Firewall (ufw for apt, firewalld for dnf)
                     sudo apt install ufw -y
