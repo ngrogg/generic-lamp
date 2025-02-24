@@ -137,7 +137,13 @@ function runProgram(){
                     sudo apt update -y && sudo apt upgrade -y && sudo apt autoremove -y
 
                     #### Install Apache + modsecurity
-                    sudo apt install python3-certbot-apache certbot apache2 fail2ban rsyslog
+                    sudo apt install python3-certbot-apache certbot apache2
+
+                    #### Install commonly used software
+                    sudo apt install vim htop net-tools curl wget git fail2ban rsyslog unattended-upgrades bash-completion -y
+
+                    #### Configure unattended upgrades
+                    sudo dpkg-reconfigure -plow unattended-upgrades
 
                     ##### Enable Apache
                     sudo systemctl enable apache2
@@ -159,12 +165,6 @@ function runProgram(){
                     sudo ufw allow 'WWW Full'
 
                     #### Install PHP + basic MySQL libraries
-
-                    #### Install common software
-                    sudo apt install vim htop net-tools curl wget git unattended-upgrades bash-completion -y
-
-                    #### Configure unattended upgrades
-                    sudo dpkg-reconfigure -plow unattended-upgrades
 
                     ;;
             [Uu]buntu)
