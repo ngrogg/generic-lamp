@@ -160,6 +160,12 @@ function runProgram(){
 
                     #### Install PHP + basic MySQL libraries
 
+                    #### Install common software
+                    sudo apt install vim htop net-tools curl wget git unattended-upgrades bash-completion -y
+
+                    #### Configure unattended upgrades
+                    sudo dpkg-reconfigure -plow unattended-upgrades
+
                     ;;
             [Uu]buntu)
                     printf "%s\n" \
