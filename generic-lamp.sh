@@ -25,14 +25,8 @@ function helpFunction(){
 	" " \
 	"configure/Configure" \
 	"* Configure generic LAMP stack" \
-	"* Takes a Distro as an argument" \
-	"Ex. ./generic-lamp.sh configure DISTRO" \
-    " " \
-    "Accepted Distros: " \
-    "* Debian" \
-    "* Fedora" \
-    "* Rocky " \
-    "* Ubuntu" \
+	"* Takes a DEB or RPM as an argument" \
+	"Ex. ./generic-lamp.sh configure DEB" \
     " "
 }
 
@@ -115,7 +109,7 @@ function runProgram(){
     printf "%s\n" \
     "IMPORTANT: Value confirmation" \
     "----------------------------------------------------" \
-    "Server Distro: " "$1" \
+    "Server Distro Type: " "$1" \
     " " \
     "Database tech to install: " "$databaseString" \
     " " \
@@ -126,16 +120,16 @@ function runProgram(){
 
     read junkInput
 
-    ### Check Distro, make distro specific changes
+    ### Check Distro type, make distro specific changes
 	printf "%s\n" \
 	"Confirming passed Distro" \
 	"----------------------------------------------------" \
     " "
 
     case "$1" in
-            [Dd]ebian)
+            [Dd][Ee][Bb])
                     printf "%s\n" \
-                    "Debian" \
+                    "DEB based distro" \
                     "----------------------------------------------------" \
                     " "
                     packageManager="apt"
@@ -175,47 +169,9 @@ function runProgram(){
                     #### Install PHP + basic MySQL libraries
 
                     ;;
-            [Uu]buntu)
+            [Rr][Pp][Mm])
                     printf "%s\n" \
-                    "Ubuntu" \
-                    "----------------------------------------------------" \
-                    " "
-                    packageManager="apt"
-
-                    #TODO
-                    #### Check for updates
-                    #### Install Apache + modsecurity
-                    ##### Enable Apache
-                    #### Install MySQL or MariaDB based on databaseTech
-                    ##### Enable MySQL/MariaDB
-                    ##### Configure MySQL/MariaDB
-                    #### Install Firewall (ufw for apt, firewalld for dnf)
-                    ##### Configure firewall for port 22, 80, 443 and 3306
-                    #### Install PHP + basic MySQL libraries
-
-                    ;;
-            [Ff]edora)
-                    printf "%s\n" \
-                    "Fedora" \
-                    "----------------------------------------------------" \
-                    " "
-                    packageManager="dnf"
-
-                    #TODO
-                    #### Check for updates
-                    #### Install Apache + modsecurity
-                    ##### Enable Apache
-                    #### Install MySQL or MariaDB based on databaseTech
-                    ##### Enable MySQL/MariaDB
-                    ##### Configure MySQL/MariaDB
-                    #### Install Firewall (ufw for apt, firewalld for dnf)
-                    ##### Configure firewall for port 22, 80, 443 and 3306
-                    #### Install PHP + basic MySQL libraries
-
-                    ;;
-            [Rr]ocky)
-                    printf "%s\n" \
-                    "Rocky" \
+                    "RPM based distro" \
                     "----------------------------------------------------" \
                     " "
                     packageManager="dnf"
@@ -234,7 +190,7 @@ function runProgram(){
                     ;;
             *)
                     printf "%s\n" \
-                    "ISSUE DETECTED - Invalid Distro provided!" \
+                    "ISSUE DETECTED - Invalid Distro type provided!" \
                     "----------------------------------------------------" \
                     "Running help script and exiting." \
                     "Re-run script with valid input"
