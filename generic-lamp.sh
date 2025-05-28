@@ -27,7 +27,8 @@ function helpFunction(){
 	"* Configure generic LAMP stack" \
 	"* Takes a DEB or RPM as an argument" \
 	"Ex. ./generic-lamp.sh configure DEB" \
-    " "
+    " " \
+    "User will need root (sudo) perms"
 }
 
 # Function to run program
@@ -148,7 +149,7 @@ function runProgram(){
                     sudo systemctl enable fail2ban
                     sudo systemctl start fail2ban
 
-                    #### Install Firewall (ufw for apt, firewalld for dnf)
+                    #### Install Firewall (ufw for DEB, firewalld for RPM)
                     sudo apt install ufw -y
 
                     ##### Configure firewall for port 22, 80, 443 and 3306
@@ -175,16 +176,68 @@ function runProgram(){
                         exit 1
                     fi
 
-                    #TODO
+                    #### DNF enable parallel downloads
+                    echo "max_parallel_downloads=10" >> /etc/dnf.conf
+                    echo "fastestmirror=True" >> /etc/dnf.conf
+
                     #### Check for updates
+                    sudo dnf update -y && sudo dnf upgrade -y && sudo dnf autoremove -y
+
+                    #TODO Adjust for use case as needed
+                    #### Enable epel repo
+                    sudo dnf install epel-release -y
+
+                    #### Install commonly used software
+                    sudo dnf install wget curl nmap fail2ban -y
+
                     #### Install Apache + modsecurity
+                    sudo dnf install httpd mod_security -y
+
                     ##### Enable Apache
+                    sudo systemctl enable httpd
+                    sudo systemctl start httpd
+
                     #### Install MySQL or MariaDB based on databaseTech
-                    ##### Enable MySQL/MariaDB
-                    ##### Configure MySQL/MariaDB
-                    #### Install Firewall (ufw for apt, firewalld for dnf)
+                    if [[ $databaseTech -eq 1 ]];then
+                        sudo dnf install mysql mysql-common mysql-server -y
+
+                        ##### Enable MySQL/MariaDB
+                        sudo systemctl enable mysqld
+                        sudo systemctl start mysqld
+
+                        ##### Configure MySQL/MariaDB
+                        sudo mysql_secure_installation
+                    else
+                        sudo dnf install mariadb mariadb-common mariadb-server -y
+
+                        ##### Enable MySQL/MariaDB
+                        sudo systemctl enable mariadb
+                        sudo systemctl start mariadb
+
+                        ##### Configure MySQL/MariaDB
+                        sudo mariadb-secure-installation
+                    fi
+
+                    #### Install Firewall (ufw for DEB, firewalld for RPM)
+                    sudo dnf install firewalld -y
+                    sudo dnf enable firewalld
+
                     ##### Configure firewall for port 22, 80, 443 and 3306
+                    sudo firewall-cmd --zone=public --permanent --add-port=22/tcp
+                    sudo firewall-cmd --zone=public --add-service=http --permanent
+                    sudo firewall-cmd --zone=public --add-service=https --permanent
+                    sudo firewall-cmd --zone=public --permanent --add-port=3306/tcp
+                    sudo firewall-cmd --reload
+
+                    #### Start/enable fail2ban
+                    sudo systemctl enable fail2ban
+                    sudo systemctl start fail2ban
+
                     #### Install PHP + basic MySQL libraries
+                    sudo dnf install php php-fpm php-cli php-gd php-mysqlnd -y
+                    sudo systemctl enable php-fpm
+                    sudo systemctl restart php-fpm
+                    sudo systemctl restart httpd
 
                     ;;
             *)
