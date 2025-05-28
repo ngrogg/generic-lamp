@@ -58,7 +58,7 @@ function runProgram(){
             "Choose a Database technology:" \
             "1: MySQL " \
             "2: MariaDB " \
-            "Enter 1 or 2: ${yellow}"
+            "Enter 1 or 2: ${normal}"
             read databaseTech
     done
 
@@ -68,43 +68,6 @@ function runProgram(){
             databaseString="MariaDB"
     fi
 
-    ### Prompt user to confirm if WordPress should be installed
-	printf "%s\n" \
-	"${yellow}WordPress install?" \
-	"----------------------------------------------------" \
-    "Confirm if WordPress should be installed:" \
-    "1: Install WordPress" \
-    "0: Do NOT install WordPress" \
-    " " \
-    "IMPORTANT: Will not create/configure Apache vhost!" \
-    " " \
-    "Enter 1 or 0: ${normal}"
-    read wordpressBool
-
-    #### Validation
-    while [[ $wordpressBool -ne 1 && $wordpressBool -ne 0 ]]; do
-            printf "%s\n" \
-            "${red}ISSUE: Incorrect value passed" \
-            "----------------------------------------------------" \
-            " " \
-            "${yellow}WordPress install?" \
-            "----------------------------------------------------" \
-            "Confirm if WordPress should be installed:" \
-            "1: Install WordPress" \
-            "0: Do NOT install WordPress" \
-            " " \
-            "IMPORTANT: Will not create/configure an Apache vhost!" \
-            " " \
-            "Enter 1 or 0: ${normal}"
-            read wordpressBool
-    done
-
-    if [[ $wordpressBool -eq 1 ]]; then
-            wordPressString="yes"
-    else
-            wordPressString="no"
-    fi
-
     ### Value confirmation before proceeding
     printf "%s\n" \
     "IMPORTANT: Value confirmation" \
@@ -112,8 +75,6 @@ function runProgram(){
     "Server Distro Type: " "$1" \
     " " \
     "Database tech to install: " "$databaseString" \
-    " " \
-    "Install WordPress? " "$wordPressString" \
     " " \
     "If all clear press enter to proceed or ctrl-c to cancel " \
     " "
@@ -132,29 +93,56 @@ function runProgram(){
                     "DEB based distro" \
                     "----------------------------------------------------" \
                     " "
-                    packageManager="apt"
 
-                    #TODO
+                    #### Validation, check for apt
+                    if [[ ! -f /usr/bin/apt ]]; then
+                        printf "%s\n" \
+                        "${red}ISSUE DETECTED: Apt not found!" \
+                        "----------------------------------------------------" \
+                        "Review server or double check passed arguments"
+                        exit 1
+                    fi
+
                     #### Check for updates
                     sudo apt update -y && sudo apt upgrade -y && sudo apt autoremove -y
 
-                    #### Install Apache + modsecurity
-                    sudo apt install python3-certbot-apache certbot apache2
+                    #### Install Apache + certbot for SSL + modsecurity
+                    sudo apt install python3-certbot-apache certbot apache2 libapache2-mod-security2 -y
 
+                    #TODO: Adjust for use case as needed
                     #### Install commonly used software
-                    sudo apt install vim htop net-tools curl wget git fail2ban rsyslog unattended-upgrades bash-completion -y
+                    sudo apt install vim htop net-tools curl wget fail2ban logrotate rsyslog unattended-upgrades bash-completion -y
 
-                    #### Configure unattended upgrades
-                    sudo dpkg-reconfigure -plow unattended-upgrades
+                    #### Configure unattended upgrades, -p medium should skip low priority questions
+                    sudo dpkg-reconfigure -pmedium unattended-upgrades
 
-                    ##### Enable Apache
+                    ##### Enable Apache + modsecurity header
                     sudo systemctl enable apache2
+                    sudo a2enmod headers
+                    sudo systemctl start apache2
 
-                    #### Install MySQL or MariaDB based on databaseTech
-                    ##### Enable MySQL/MariaDB
-                    ##### Configure MySQL/MariaDB
+                    #### Install/configure MySQL or MariaDB based on databaseTech
+                    if [[ $databaseTech -eq 1 ]];then
+                            sudo apt install mysql-client mysql-common mysql-server -y
 
-                    #### Enable fail2ban
+                            ##### Enable MySQL/MariaDB
+                            sudo systemctl enable mysql
+                            sudo systemctl start mysql
+
+                            ##### Configure MySQL/MariaDB
+                            sudo mysql_secure_installation
+                    else
+                            sudo apt install mariadb-client mariadb-common mariadb-server -y
+
+                            ##### Enable MySQL/MariaDB
+                            sudo systemctl enable mariadb
+                            sudo systemctl start mariadb
+
+                            ##### Configure MySQL/MariaDB
+                            sudo mariadb-secure-installation
+                    fi
+
+                    #### Enable fail2ban, by default requires rsyslog
                     sudo systemctl enable rsyslog
                     sudo systemctl start rsyslog
                     sudo systemctl enable fail2ban
@@ -166,7 +154,11 @@ function runProgram(){
                     ##### Configure firewall for port 22, 80, 443 and 3306
                     sudo ufw allow 'WWW Full'
 
-                    #### Install PHP + basic MySQL libraries
+                    #### Install PHP + PHP-FPM + basic MySQL library + php Apache library
+                    sudo apt install php php-cli php-cgi php-fpm php-common php-mysql libapache2-mod-php
+                    sudo systemctl enable php-fpm
+                    sudo a2enmod php
+                    sudo systemctl restart apache2
 
                     ;;
             [Rr][Pp][Mm])
@@ -174,7 +166,14 @@ function runProgram(){
                     "RPM based distro" \
                     "----------------------------------------------------" \
                     " "
-                    packageManager="dnf"
+                    #### Validation, check for dnf
+                    if [[ ! -f /usr/bin/dnf ]]; then
+                        printf "%s\n" \
+                        "${red}ISSUE DETECTED: DNF not found!" \
+                        "----------------------------------------------------" \
+                        "Review server or double check passed arguments"
+                        exit 1
+                    fi
 
                     #TODO
                     #### Check for updates
@@ -198,11 +197,16 @@ function runProgram(){
                     ;;
     esac
 
-    #### Install WordPress based on wordpressBool
-    ##### Create docroot
-    ##### Install WordPress files
-    ##### Create upload folder
-    ##### Prompt user for next steps
+    #### Prompt user for next steps
+    printf "%s\n" \
+    "${green}Script complete" \
+    "----------------------------------------------------" \
+    "Check the following:" \
+    "* Failed Services" \
+    "* Service configurations" \
+    "* Packages" \
+    "* Logrotate" \
+    "* Logging${normal}"
 
 }
 

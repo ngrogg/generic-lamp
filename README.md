@@ -1,7 +1,7 @@
 # Generic Lamp
 
 ## Overview
-A BASH script for configuring a generic Linux LAMP stack
+A BASH script for configuring a generic Linux LAMP stack.
 
 ## Usage
 ### Arguments
