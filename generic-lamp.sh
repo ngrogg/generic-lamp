@@ -4,7 +4,17 @@
 # BASH script for configuring a generic LAMP stack
 # By Nicholas Grogg
 
-## Help function
+# Color variables
+## Errors
+red=$(tput setaf 1)
+## Clear checks
+green=$(tput setaf 2)
+## User input required
+yellow=$(tput setaf 3)
+## Set text back to standard terminal font
+normal=$(tput sgr0)
+
+# Help function
 function helpFunction(){
 	printf "%s\n" \
 	"Help" \
@@ -26,7 +36,7 @@ function helpFunction(){
     " "
 }
 
-## Function to run program
+# Function to run program
 function runProgram(){
 	printf "%s\n" \
 	"Configure" \
@@ -35,27 +45,26 @@ function runProgram(){
 
     ### Prompt user to choose a Database Technology
 	printf "%s\n" \
-	"MySQL or MariaDB?" \
+	"${yellow}MySQL or MariaDB?" \
 	"----------------------------------------------------" \
     "Choose a Database technology:" \
     "1: MySQL " \
     "2: MariaDB " \
-    "Enter 1 or 2: "
+    "Enter 1 or 2: ${normal}"
     read databaseTech
 
     #### Validation
     while [[ $databaseTech -ne 1 && $databaseTech -ne 0 ]]; do
             printf "%s\n" \
-            " " \
-            "ISSUE: Incorrect value passed" \
+            "${red}ISSUE: Incorrect value passed" \
             "----------------------------------------------------" \
             " " \
-            "MySQL or MariaDB?" \
+            "${yellow}MySQL or MariaDB?" \
             "----------------------------------------------------" \
             "Choose a Database technology:" \
             "1: MySQL " \
             "2: MariaDB " \
-            "Enter 1 or 2: "
+            "Enter 1 or 2: ${yellow}"
             read databaseTech
     done
 
@@ -67,7 +76,7 @@ function runProgram(){
 
     ### Prompt user to confirm if WordPress should be installed
 	printf "%s\n" \
-	"WordPress install?" \
+	"${yellow}WordPress install?" \
 	"----------------------------------------------------" \
     "Confirm if WordPress should be installed:" \
     "1: Install WordPress" \
@@ -75,17 +84,16 @@ function runProgram(){
     " " \
     "IMPORTANT: Will not create/configure Apache vhost!" \
     " " \
-    "Enter 1 or 0: "
+    "Enter 1 or 0: ${normal}"
     read wordpressBool
 
     #### Validation
     while [[ $wordpressBool -ne 1 && $wordpressBool -ne 0 ]]; do
             printf "%s\n" \
-            " " \
-            "ISSUE: Incorrect value passed" \
+            "${red}ISSUE: Incorrect value passed" \
             "----------------------------------------------------" \
             " " \
-            "WordPress install?" \
+            "${yellow}WordPress install?" \
             "----------------------------------------------------" \
             "Confirm if WordPress should be installed:" \
             "1: Install WordPress" \
@@ -93,7 +101,7 @@ function runProgram(){
             " " \
             "IMPORTANT: Will not create/configure an Apache vhost!" \
             " " \
-            "Enter 1 or 0: "
+            "Enter 1 or 0: ${normal}"
             read wordpressBool
     done
 
@@ -239,38 +247,39 @@ function runProgram(){
     ##### Install WordPress files
     ##### Create upload folder
     ##### Prompt user for next steps
+
 }
 
 ## Main, read passed flags
-	printf "%s\n" \
-	"Generic Lamp" \
-	"----------------------------------------------------" \
-	" " \
-	"Checking flags passed" \
-	"----------------------------------------------------"
+printf "%s\n" \
+"Generic Lamp" \
+"----------------------------------------------------" \
+" " \
+"Checking flags passed" \
+"----------------------------------------------------"
 
-## Check passed flags
+# Check passed flags
 case "$1" in
 [Hh]elp)
-	printf "%s\n" \
-	"Running Help function" \
-	"----------------------------------------------------" \
-	helpFunction
-	exit
-	;;
+    printf "%s\n" \
+    "Running Help function" \
+    "----------------------------------------------------"
+    helpFunction
+    exit
+    ;;
 [Cc]onfigure)
-	printf "%s\n" \
-	"Running script" \
-	"----------------------------------------------------"
+    printf "%s\n" \
+    "Running script" \
+    "----------------------------------------------------"
 	runProgram $2
-	;;
+    ;;
 *)
-	printf "%s\n" \
-	"ISSUE DETECTED - Invalid input detected!" \
-	"----------------------------------------------------" \
-	"Running help script and exiting." \
-	"Re-run script with valid input"
-	helpFunction
-	exit
-	;;
+    printf "%s\n" \
+    "${red}ISSUE DETECTED - Invalid input detected!" \
+    "----------------------------------------------------" \
+    "Running help script and exiting." \
+    "Re-run script with valid input${normal}"
+    helpFunction
+    exit
+    ;;
 esac
