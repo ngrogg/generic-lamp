@@ -16,58 +16,27 @@ normal=$(tput sgr0)
 
 # Help function
 function helpFunction(){
-	printf "%s\n" \
-	"Help" \
-	"----------------------------------------------------" \
-	" " \
-	"help/Help" \
-	"* Display this help message and exit" \
-	" " \
-	"configure/Configure" \
-	"* Configure generic LAMP stack" \
-	"* Takes a DEB or RPM as an argument" \
-	"Ex. ./generic-lamp.sh configure DEB" \
+    printf "%s\n" \
+    "Help" \
+    "----------------------------------------------------" \
+    " " \
+    "help/Help" \
+    "* Display this help message and exit" \
+    " " \
+    "configure/Configure" \
+    "* Configure generic LAMP stack" \
+    "* Takes a DEB or RPM as an argument" \
+    "Ex. ./generic-lamp.sh configure DEB" \
     " " \
     "User will need root (sudo) perms"
 }
 
 # Function to run program
 function runProgram(){
-	printf "%s\n" \
-	"Configure" \
-	"----------------------------------------------------" \
+    printf "%s\n" \
+    "Configure" \
+    "----------------------------------------------------" \
     " "
-
-    ### Prompt user to choose a Database Technology
-	printf "%s\n" \
-	"${yellow}MySQL or MariaDB?" \
-	"----------------------------------------------------" \
-    "Choose a Database technology:" \
-    "1: MySQL " \
-    "2: MariaDB " \
-    "Enter 1 or 2: ${normal}"
-    read databaseTech
-
-    #### Validation
-    while [[ $databaseTech -ne 1 && $databaseTech -ne 0 ]]; do
-            printf "%s\n" \
-            "${red}ISSUE: Incorrect value passed" \
-            "----------------------------------------------------" \
-            " " \
-            "${yellow}MySQL or MariaDB?" \
-            "----------------------------------------------------" \
-            "Choose a Database technology:" \
-            "1: MySQL " \
-            "2: MariaDB " \
-            "Enter 1 or 2: ${normal}"
-            read databaseTech
-    done
-
-    if [[ $databaseTech -eq 1 ]]; then
-            databaseString="MySQL"
-    else
-            databaseString="MariaDB"
-    fi
 
     ### Value confirmation before proceeding
     printf "%s\n" \
@@ -75,17 +44,15 @@ function runProgram(){
     "----------------------------------------------------" \
     "Server Distro Type: " "$1" \
     " " \
-    "Database tech to install: " "$databaseString" \
-    " " \
     "If all clear press enter to proceed or ctrl-c to cancel " \
     " "
 
     read junkInput
 
     ### Check Distro type, make distro specific changes
-	printf "%s\n" \
-	"Confirming passed Distro" \
-	"----------------------------------------------------" \
+    printf "%s\n" \
+    "Confirming passed Distro" \
+    "----------------------------------------------------" \
     " "
 
     case "$1" in
@@ -108,11 +75,26 @@ function runProgram(){
                     sudo apt update -y && sudo apt upgrade -y && sudo apt autoremove -y
 
                     #### Install Apache + certbot for SSL + modsecurity
-                    sudo apt install python3-certbot-apache certbot apache2 libapache2-mod-security2 -y
+                    sudo apt install -y \
+                        apache2 \
+                        certbot \
+                        libapache2-mod-security2 \
+                        python3-certbot-apache
 
                     #TODO: Adjust for use case as needed
                     #### Install commonly used software
-                    sudo apt install vim htop net-tools curl wget fail2ban logrotate rsyslog unattended-upgrades bash-completion -y
+                    sudo apt install -y \
+                        bash-completion \
+                        curl \
+                        fail2ban \
+                        htop \
+                        logrotate \
+                        net-tools \
+                        rsyslog \
+                        unattended-upgrades \
+                        vim \
+                        vim-nox \
+                        wget
 
                     #### Configure unattended upgrades, -p medium should skip low priority questions
                     sudo dpkg-reconfigure -pmedium unattended-upgrades
@@ -122,26 +104,18 @@ function runProgram(){
                     sudo a2enmod headers
                     sudo systemctl start apache2
 
-                    #### Install/configure MySQL or MariaDB based on databaseTech
-                    if [[ $databaseTech -eq 1 ]];then
-                            sudo apt install mysql-client mysql-common mysql-server -y
+                    #### Install/configure MariaDB
+                    sudo apt install -y \
+                        mariadb-client \
+                        mariadb-common \
+                        mariadb-server
 
-                            ##### Enable MySQL/MariaDB
-                            sudo systemctl enable mysql
-                            sudo systemctl start mysql
+                    ##### Enable MySQL/MariaDB
+                    sudo systemctl enable mariadb
+                    sudo systemctl start mariadb
 
-                            ##### Configure MySQL/MariaDB
-                            sudo mysql_secure_installation
-                    else
-                            sudo apt install mariadb-client mariadb-common mariadb-server -y
-
-                            ##### Enable MySQL/MariaDB
-                            sudo systemctl enable mariadb
-                            sudo systemctl start mariadb
-
-                            ##### Configure MySQL/MariaDB
-                            sudo mariadb-secure-installation
-                    fi
+                    ##### Configure MySQL/MariaDB
+                    sudo mariadb-secure-installation
 
                     #### Enable fail2ban, by default requires rsyslog
                     sudo systemctl enable rsyslog
@@ -149,14 +123,22 @@ function runProgram(){
                     sudo systemctl enable fail2ban
                     sudo systemctl start fail2ban
 
-                    #### Install Firewall (ufw for DEB, firewalld for RPM)
+                    #### Install Firewall
                     sudo apt install ufw -y
 
                     ##### Configure firewall for port 22, 80, 443 and 3306
                     sudo ufw allow 'WWW Full'
 
                     #### Install PHP + PHP-FPM + basic MySQL library + php Apache library
-                    sudo apt install php php-cli php-cgi php-fpm php-common php-mysql libapache2-mod-php
+                    sudo apt install -y \
+                        libapache2-mod-php \
+                        php \
+                        php-cgi \
+                        php-cli \
+                        php-common \
+                        php-fpm \
+                        php-mysql
+
                     sudo systemctl enable php-fpm
                     sudo a2enmod php
                     sudo systemctl restart apache2
@@ -177,7 +159,7 @@ function runProgram(){
                     fi
 
                     #### DNF enable parallel downloads
-                    echo "max_parallel_downloads=10" >> /etc/dnf.conf
+                    echo "max_parallel_downloads=20" >> /etc/dnf.conf
                     echo "fastestmirror=True" >> /etc/dnf.conf
 
                     #### Check for updates
@@ -188,35 +170,32 @@ function runProgram(){
                     sudo dnf install epel-release -y
 
                     #### Install commonly used software
-                    sudo dnf install wget curl nmap fail2ban -y
+                    sudo dnf install -y \
+                        curl \
+                        fail2ban \
+                        firewalld \
+                        nmap \
+                        vim \
+                        wget
 
                     #### Install Apache + modsecurity
-                    sudo dnf install httpd mod_security -y
+                    sudo dnf install -y \
+                        httpd \
+                        mod_security
 
                     ##### Enable Apache
                     sudo systemctl enable httpd
                     sudo systemctl start httpd
 
                     #### Install MySQL or MariaDB based on databaseTech
-                    if [[ $databaseTech -eq 1 ]];then
-                        sudo dnf install mysql mysql-common mysql-server -y
+                    sudo dnf install mariadb mariadb-common mariadb-server -y
 
-                        ##### Enable MySQL/MariaDB
-                        sudo systemctl enable mysqld
-                        sudo systemctl start mysqld
+                    ##### Enable MySQL/MariaDB
+                    sudo systemctl enable mariadb
+                    sudo systemctl start mariadb
 
-                        ##### Configure MySQL/MariaDB
-                        sudo mysql_secure_installation
-                    else
-                        sudo dnf install mariadb mariadb-common mariadb-server -y
-
-                        ##### Enable MySQL/MariaDB
-                        sudo systemctl enable mariadb
-                        sudo systemctl start mariadb
-
-                        ##### Configure MySQL/MariaDB
-                        sudo mariadb-secure-installation
-                    fi
+                    ##### Configure MySQL/MariaDB
+                    sudo mariadb-secure-installation
 
                     #### Install Firewall (ufw for DEB, firewalld for RPM)
                     sudo dnf install firewalld -y
@@ -234,7 +213,13 @@ function runProgram(){
                     sudo systemctl start fail2ban
 
                     #### Install PHP + basic MySQL libraries
-                    sudo dnf install php php-fpm php-cli php-gd php-mysqlnd -y
+                    sudo dnf install -y \
+                        php \
+                        php-cli \
+                        php-fpm \
+                        php-gd \
+                        php-mysqlnd
+
                     sudo systemctl enable php-fpm
                     sudo systemctl restart php-fpm
                     sudo systemctl restart httpd
@@ -284,7 +269,7 @@ case "$1" in
     printf "%s\n" \
     "Running script" \
     "----------------------------------------------------"
-	runProgram $2
+    runProgram $2
     ;;
 *)
     printf "%s\n" \
