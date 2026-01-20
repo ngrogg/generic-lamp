@@ -110,11 +110,11 @@ function runProgram(){
                         mariadb-common \
                         mariadb-server
 
-                    ##### Enable MySQL/MariaDB
+                    ##### Enable MariaDB
                     sudo systemctl enable mariadb
                     sudo systemctl start mariadb
 
-                    ##### Configure MySQL/MariaDB
+                    ##### Configure MariaDB
                     sudo mariadb-secure-installation
 
                     #### Enable fail2ban, by default requires rsyslog
@@ -129,7 +129,7 @@ function runProgram(){
                     ##### Configure firewall for port 22, 80, 443 and 3306
                     sudo ufw allow 'WWW Full'
 
-                    #### Install PHP + PHP-FPM + basic MySQL library + php Apache library
+                    #### Install PHP + PHP-FPM + basic MariaDB library + php Apache library
                     sudo apt install -y \
                         libapache2-mod-php \
                         php \
@@ -166,12 +166,14 @@ function runProgram(){
                     sudo dnf update -y && sudo dnf upgrade -y && sudo dnf autoremove -y
 
                     #TODO Adjust for use case as needed
-                    #### Enable epel repo
+                    #### Enable repos
+                    ##### Enable EPEL repo
                     sudo dnf install epel-release -y
 
                     #### Install commonly used software
                     sudo dnf install -y \
                         curl \
+                        dnf-automatic \
                         fail2ban \
                         firewalld \
                         nmap \
@@ -187,14 +189,14 @@ function runProgram(){
                     sudo systemctl enable httpd
                     sudo systemctl start httpd
 
-                    #### Install MySQL or MariaDB based on databaseTech
+                    #### Install  or MariaDB based on databaseTech
                     sudo dnf install mariadb mariadb-common mariadb-server -y
 
-                    ##### Enable MySQL/MariaDB
+                    ##### Enable MariaDB
                     sudo systemctl enable mariadb
                     sudo systemctl start mariadb
 
-                    ##### Configure MySQL/MariaDB
+                    ##### Configure MariaDB
                     sudo mariadb-secure-installation
 
                     #### Install Firewall (ufw for DEB, firewalld for RPM)
@@ -212,7 +214,7 @@ function runProgram(){
                     sudo systemctl enable fail2ban
                     sudo systemctl start fail2ban
 
-                    #### Install PHP + basic MySQL libraries
+                    #### Install PHP + basic MariaDB libraries
                     sudo dnf install -y \
                         php \
                         php-cli \
@@ -244,6 +246,7 @@ function runProgram(){
     "* Service configurations" \
     "* Packages" \
     "* Logrotate" \
+    "* Update settings" \
     "* Logging${normal}"
 
 }
