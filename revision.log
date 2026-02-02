@@ -1,0 +1,9 @@
+Log of major revisions for prod scripts, newest -> oldest
+
+Script:
+Revision:
+Change:
+
+Script: generic-lamp.sh
+Revision: 20260201
+Change: Added set -e flag

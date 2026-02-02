@@ -3,6 +3,10 @@
 # Generic Lamp
 # BASH script for configuring a generic LAMP stack
 # By Nicholas Grogg
+# Revision: 20260201
+
+# Set exit on error
+set -e
 
 # Color variables
 ## Errors
